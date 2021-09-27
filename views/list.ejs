@@ -1,0 +1,36 @@
+<%# insert header.ejs %>
+<%- include("header") -%>
+
+  <%# HEADER as list title (will be set to route if its not default home route) %>
+  <div class="box" id="heading">
+    <h1> <%= listTitle %> </h1>
+  </div>
+
+
+  <div class="box">
+
+    <%# going through each item in newlist  %>
+    <% newListItems.forEach(function(item){ %>
+      <%# post to /delete under this form (all the written stuff and the 3 default message) %>
+      <form action="/delete" method="post">
+        <div class="item">
+          <%# submits when box is checked%>
+          <input type="checkbox" name="checkbox" value="<%=item._id%>" onChange="this.form.submit()">
+          <p><%=  item.name  %></p>
+        </div>
+        <%# hidden input to store value to access %>
+        <input type="hidden" name="listName" value="<%=listTitle %>"></input>
+      </form>
+    <% }) %>
+
+      <%# form to let user write and post to "/" %>
+      <form class="item" action="/" method="post">
+        <input type="text" name="newItem" placeholder="New Item" autocomplete="off">
+        <%# gave value as listTitle "/" %>
+        <button type="submit" name="list" value="<%=listTitle%>">+</button>
+      </form>
+
+  </div>
+
+<%# insert footer.ejs %>
+<%- include("footer") -%>
