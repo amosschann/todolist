@@ -11,7 +11,7 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 //connecting to database server (mongodb)
-mongoose.connect("mongodb+srv://admin-Amos:test123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
+mongoose.connect("mongodb+srv://admin-Amos:test-123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
 
 //Schema for Items
 const itemsSchema = {
