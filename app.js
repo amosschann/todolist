@@ -2,14 +2,13 @@
 
 //require all the packages to use them
 const express = require("express");
-const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const app = express();
 const _ = require("lodash");
 //setting view engine
 app.set('view engine', 'ejs');
 //using express and bodyParser
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 //connecting to database server (mongodb)
 mongoose.connect("mongodb+srv://admin-Amos:test123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
@@ -167,7 +166,7 @@ if (port == null || port == "") {
 
 
 
-//server starts on port 3000 and listens for browser
+//server starts on port and listens for browser
 app.listen(port, function() {
-  console.log("Server started successfully");
+  console.log("Server started successfully on port 3000");
 });
