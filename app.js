@@ -13,110 +13,115 @@ app.use(express.static("public"));
 //connecting to database server (mongodb)
 mongoose.connect("mongodb+srv://admin-Amos:test-123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
 
-//Schema for Items
 const itemsSchema = {
   name: String
 };
-//model for schema
-const Item = mongoose.model("Item",itemsSchema);
 
-//creating new items
+const Item = mongoose.model("Item", itemsSchema);
+
+
 const item1 = new Item({
   name: "Welcome to your todolist!"
 });
 
 const item2 = new Item({
-  name: "Hit the + button to add a new item"
+  name: "Hit the + button to add a new item."
 });
 
 const item3 = new Item({
-  name: "<-- Hit this to delete an item"
+  name: "<-- Hit this to delete an item."
 });
 
-//items array
-const defaultItems = [item1,item2,item3];
+const defaultItems = [item1, item2, item3];
 
-//Schema other routes to include itemSchema as well
-const listSchema ={
+const listSchema = {
   name: String,
   items: [itemsSchema]
 };
-//model for schema
-const List = mongoose.model("List",listSchema);
+
+const List = mongoose.model("List", listSchema);
 
 
-//when user goes to default route "/"
 app.get("/", function(req, res) {
-  //looking through Item db
-  Item.find({},function(err,foundItems){
-    //if item db is empty, insert item1 2 and 3 (defualtItems)
-    if(foundItems.length === 0){
-      Item.insertMany(defaultItems,function(err){
-        if (err){
+
+  Item.find({}, function(err, foundItems){
+
+    if (foundItems.length === 0) {
+      Item.insertMany(defaultItems, function(err){
+        if (err) {
           console.log(err);
-        }else{
-          console.log("successfully saved default items to DB.")
+        } else {
+          console.log("Successfully savevd default items to DB.");
         }
       });
-      //redirect to refresh page after saving defaultItems to db
-      res.redirect("/")
-    }else{
-      //render list.ejs with listTitle and newListItems(to connect to ejs side %%)
+      res.redirect("/");
+    } else {
       res.render("list", {listTitle: "Today", newListItems: foundItems});
     }
   });
 
 });
 
-//process user post request to "/"
-app.post("/", function(req, res){
-  // itemName = text user input  listName = button value = listtitle(header)
-  const itemName = req.body.newItem;
-  const listName = req.body.list
+app.get("/:customListName", function(req, res){
+  const customListName = _.capitalize(req.params.customListName);
 
-  //create new item from the itemName (the text user input)
+  List.findOne({name: customListName}, function(err, foundList){
+    if (!err){
+      if (!foundList){
+        //Create a new list
+        const list = new List({
+          name: customListName,
+          items: defaultItems
+        });
+        list.save();
+        res.redirect("/" + customListName);
+      } else {
+        //Show an existing list
+
+        res.render("list", {listTitle: foundList.name, newListItems: foundList.items});
+      }
+    }
+  });
+
+
+
+});
+
+app.post("/", function(req, res){
+
+  const itemName = req.body.newItem;
+  const listName = req.body.list;
+
   const item = new Item({
     name: itemName
   });
 
-  // if listTitle is "Today" = main page
-  if(listName === "Today"){
+  if (listName === "Today"){
     item.save();
     res.redirect("/");
-  }else{
-    //if the listTitle is another name = not main page (/custom page name), scan through List to find header name (should have been created through app.get(/custom list name))
-    List.findOne({name: listName},function(err,foundList){
-      //push new item into the list (with he listSchema model)
+  } else {
+    List.findOne({name: listName}, function(err, foundList){
       foundList.items.push(item);
       foundList.save();
-      //redirect back to custom dir
       res.redirect("/" + listName);
     });
   }
-
 });
 
-
-//process user post request to "/delete"
-app.post("/delete",function(req,res){
-  //checkbox item id in db (checkbox input) listname from (hidden input: value of it = listname)
-  const checkedItemID = req.body.checkbox;
+app.post("/delete", function(req, res){
+  const checkedItemId = req.body.checkbox;
   const listName = req.body.listName;
-  //if its on the home page
-  if(listName === "Today"){
-    //remove by id and redirect back to home page
-    Item.findByIdAndRemove(checkedItemID,function(err){
-      if(err){
-        console.log(err);
-      }else{
-        console.log("successfully deleted item");
+
+  if (listName === "Today") {
+    Item.findByIdAndRemove(checkedItemId, function(err){
+      if (!err) {
+        console.log("Successfully deleted checked item.");
         res.redirect("/");
       }
-    })
-  }else{
-    //if its not on the home page, find the listname and delete the value that coorospond to the item id in the listname array
-    List.findOneAndUpdate({name: listName},{$pull:{items: {_id: checkedItemID}}},function(err,foundList){
-      if(!err){
+    });
+  } else {
+    List.findOneAndUpdate({name: listName}, {$pull: {items: {_id: checkedItemId}}}, function(err, foundList){
+      if (!err){
         res.redirect("/" + listName);
       }
     });
@@ -125,35 +130,6 @@ app.post("/delete",function(req,res){
 
 });
 
-
-//custom dir
-app.get("/:customListName",function(req,res){
-  //custom list name string and caps first alphabet using lodash
-  const customListName = _.capitalize(req.params.customListName)
-  //check if customlistname is alr in db
-  List.findOne({name: customListName},function(err,foundList){
-    if(err){
-      console.log(err);
-    }else{
-      //create new list if not found in dd, save and redirect back to custom dir
-      if(!foundList){
-        const list = new List ({
-          name: customListName,
-          items: defaultItems
-        })
-        list.save();
-        res.redirect("/" + customListName);
-      }else{
-        //show an existing list
-        res.render("list",{listTitle: foundList.name, newListItems: foundList.items})
-      }
-    }
-
-  });
-
-});
-
-//about page
 app.get("/about", function(req, res){
   res.render("about");
 });
