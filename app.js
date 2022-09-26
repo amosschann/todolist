@@ -5,7 +5,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
 const _ = require("lodash");
-// const mongoKey = process.env.MONGOOSE_KEY;
+const mongoKey = process.env.MONGOOSE_KEY;
 
 //setting view engine
 app.set('view engine', 'ejs');
@@ -13,7 +13,7 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 //connecting to database server (mongodb)
-mongoose.connect("mongodb+srv://admin-Amos:test123@cluster0.ib7ct.mongodb.net/todolistDB", {useNewUrlParser: true});
+mongoose.connect(mongoKey, {useNewUrlParser: true});
 
 //test on local db
 // mongoose.connect("mongodb://localhost:27017/todolistDB",{useNewUrlParser: true});
