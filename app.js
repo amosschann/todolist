@@ -11,7 +11,8 @@ app.set('view engine', 'ejs');
 app.use(express.urlencoded({extended: true}));
 app.use(express.static("public"));
 //connecting to database server (mongodb)
-mongoose.connect("mongodb+srv://admin-Amos:test-123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
+mongoose.connect("mongodb+srv://admin-Amos:test123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
+
 
 //Schema for Items
 const itemsSchema = {
@@ -49,17 +50,17 @@ const List = mongoose.model("List",listSchema);
 app.get("/", function(req, res) {
   //looking through Item db
   Item.find({},function(err,foundItems){
-    //if item db is empty, insert item1 2 and 3 (defualtItems)
+    //if item db is empty, insert item 1 2 and 3 (defualtItems)
     if(foundItems.length === 0){
       Item.insertMany(defaultItems,function(err){
         if (err){
           console.log(err);
         }else{
-          console.log("successfully saved default items to DB.")
+          console.log("successfully saved default items to DB.");
         }
       });
       //redirect to refresh page after saving defaultItems to db
-      res.redirect("/")
+      res.redirect("/");
     }else{
       //render list.ejs with listTitle and newListItems(to connect to ejs side %%)
       res.render("list", {listTitle: "Today", newListItems: foundItems});
@@ -121,8 +122,6 @@ app.post("/delete",function(req,res){
       }
     });
   }
-
-
 });
 
 
@@ -145,12 +144,10 @@ app.get("/:customListName",function(req,res){
         res.redirect("/" + customListName);
       }else{
         //show an existing list
-        res.render("list",{listTitle: foundList.name, newListItems: foundList.items})
+        res.render("list",{listTitle: foundList.name, newListItems: foundList.items});
       }
     }
-
   });
-
 });
 
 //about page
@@ -170,3 +167,5 @@ if (port == null || port == "") {
 app.listen(port, function() {
   console.log("Server started successfully on port 3000");
 });
+
+
