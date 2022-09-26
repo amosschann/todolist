@@ -13,6 +13,10 @@ app.use(express.static("public"));
 //connecting to database server (mongodb)
 mongoose.connect("mongodb+srv://admin-Amos:test123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
 
+//test on local db
+// mongoose.connect("mongodb://localhost:27017/todolistDB",{useNewUrlParser: true});
+
+
 // Ignore favicon.ico requests.
 app.use( function(req, res, next) { 
 
@@ -35,19 +39,16 @@ const Item = mongoose.model("Item",itemsSchema);
 
 //creating new items
 const item1 = new Item({
-  name: "Welcome to your todolist!"
-});
-
-const item2 = new Item({
   name: "Hit the + button to add a new item"
 });
 
-const item3 = new Item({
+const item2 = new Item({
   name: "<-- Hit this to delete an item"
 });
 
+
 //items array
-const defaultItems = [item1,item2,item3];
+const defaultItems = [item1,item2];
 
 //Schema other routes to include itemSchema as well
 const listSchema ={
@@ -62,7 +63,7 @@ const List = mongoose.model("List",listSchema);
 app.get("/", function(req, res) {
   //looking through Item db
   Item.find({},function(err,foundItems){
-    //if item db is empty, insert item 1 2 and 3 (defualtItems)
+    //if item db is empty, insert item 1 and 2 (defualtItems)
     if(foundItems.length === 0){
       Item.insertMany(defaultItems,function(err){
         if (err){
@@ -167,7 +168,7 @@ app.get("/about", function(req, res){
   res.render("about");
 });
 
-// for heroku
+// // for heroku
 let port = process.env.PORT;
 if (port == null || port == "") {
   port = 3000;
@@ -175,9 +176,15 @@ if (port == null || port == "") {
 
 
 
-//server starts on port and listens for browser
+// //server starts on port and listens for browser
 app.listen(port, function() {
   console.log("Server started successfully on port 3000");
+});
+
+
+//test on local db
+app.listen(3000, function() {                                                   //start server on port 3000
+  console.log("Server started on port 3000");
 });
 
 
