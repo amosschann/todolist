@@ -13,6 +13,18 @@ app.use(express.static("public"));
 //connecting to database server (mongodb)
 mongoose.connect("mongodb+srv://admin-Amos:test123@cluster0.ib7ct.mongodb.net/todolistDB",{useNewUrlParser: true});
 
+// Ignore favicon.ico requests.
+app.use( function(req, res, next) { 
+
+  if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
+
+     return res.sendStatus(204);
+
+  }
+
+  return next();
+
+});
 
 //Schema for Items
 const itemsSchema = {
